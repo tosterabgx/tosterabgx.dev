@@ -1,7 +1,18 @@
+@keyframes bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(6px);}
+}
+
 :root {
   --bg: #0f1211;
   --text: #eceee9;
   --muted: #9ea7a2;
+}
+
+@media (prefers-reduced-motion:no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 * {
@@ -33,6 +44,12 @@ a {
   padding: 0 32px;
 }
 
+.screen {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
 nav {
   display: flex;
   justify-content: end;
@@ -52,10 +69,11 @@ nav a:hover {
 }
 
 #hero {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 64px;
-  padding: 48px 0 112px;
+  padding: 48px 0;
 }
 
 #hero > div {
@@ -87,3 +105,13 @@ nav a:hover {
   min-width: 0;
 }
 
+.scroll-hint {
+  align-self: center;
+  color: var(--muted);
+  padding-bottom: 24px;
+  font-size: 24px;
+  animation: bob .6s ease-in alternate infinite;
+  transition: opacity .3s ease-out;
+}
+
+.scroll-hint
