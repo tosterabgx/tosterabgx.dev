@@ -1,7 +1,14 @@
 let hint = document.querySelector(".scroll-hint");
 
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 50) {
-    hint.classList.add("hidden")
-  }
-});
+let timer = setTimeout(() => {
+  hint.classList.remove("hidden");
+}, 2000);
+
+window.addEventListener(
+  "scroll",
+  () => {
+    clearTimeout(timer);
+    hint.classList.add("hidden");
+  },
+  { once: true, passive: true },
+);
