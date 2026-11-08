@@ -114,4 +114,7 @@ nav a:hover {
   transition: opacity .3s ease-out;
 }
 
-.scroll-hint
+.scroll-hint.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
