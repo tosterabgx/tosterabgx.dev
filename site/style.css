@@ -11,6 +11,8 @@
   --bg: #0f1211;
   --text: #eceee9;
   --muted: #9ea7a2;
+  --unimportant: #6f7974;
+  --accent: #b3d4c3;
   --line: rgba(236, 238, 233, 0.12);
   --line-bright: rgba(236, 238, 233, 0.28);
 }
@@ -156,6 +158,56 @@ nav a:hover {
 .project:hover {
   border-color: var(--line-bright);
   transform: scale(1.01);
+}
+
+#guestbook {
+  padding: 96px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#guestbook h2 {
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.1;
+}
+
+.guestbook-hint {
+  color: var(--muted);
+}
+
+.guestbook-hint code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  color: var(--accent);
+}
+
+.notes {
+  margin-top: 16px;
+  border-bottom: 1px solid var(--line);
+  max-width: 720px;
+}
+
+.note {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.note-name {
+  font-weight: 500;
+}
+
+.note-date {
+  margin-left: 8px;
+  font-size: 13px;
+  color: var(--unimportant);
+}
+
+.note p {
+  margin-top: 4px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 footer {
