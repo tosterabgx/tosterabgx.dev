@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -192,7 +193,9 @@ func (m model) View() tea.View {
 	}
 
 	if m.stage == stageDone {
-		if m.err != nil {
+		if errors.Is(m.err, errRatedLimited) {
+			s += errStyle.Render("the tape is full. try again in a few minutes.") + "\n\n"
+		} else if m.err != nil {
 			s += errStyle.Render("the tape got stuck. try again later.") + "\n\n"
 		} else {
 			s += textStyle.Render("message recorded. thanks!") + "\n\n"

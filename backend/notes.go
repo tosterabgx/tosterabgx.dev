@@ -16,6 +16,13 @@ const (
 	maxNoteLen = 100
 )
 
+const (
+	rateLimitCount  = 3
+	rateLimitWindow = 10 * time.Minute
+)
+
+var errRatedLimited = errors.New("too many notes from this address")
+
 type Note struct {
 	ID        uint64    `json:"id"`
 	Name      string    `json:"name"`
@@ -53,7 +60,15 @@ func insertNote(db *sql.DB, name, message, ip string) error {
 		return errors.New("empty name or message")
 	}
 
-	_, err := db.Exec(
+	n, err := countRecentNotes(db, ip, time.Now().Add(-rateLimitWindow))
+	if err != nil {
+		return err
+	}
+	if n >= rateLimitCount {
+		return errRatedLimited
+	}
+
+	_, err = db.Exec(
 		"INSERT INTO notes (name, message, ip, created_at) VALUES (?, ?, ?, ?)",
 		name, message, ip, time.Now().Unix(),
 	)
@@ -97,4 +112,14 @@ func handleNotes(db *sql.DB) http.HandlerFunc {
 			log.Println("writing notes response:", err)
 		}
 	}
+}
+
+func countRecentNotes(db *sql.DB, ip string, since time.Time) (int, error) {
+	var n int
+	err := db.QueryRow(
+		"SELECT COUNT(*) FROM notes WHERE ip = ? AND created_at > ?",
+		ip, since.Unix(),
+	).Scan(&n)
+
+	return n, err
 }
