@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+
+	"charm.land/ssh"
 )
 
 func main() {
@@ -15,11 +18,11 @@ func main() {
 	httpAddr := "127.0.0.1:3000"
 	sshAddr := "127.0.0.1:2222"
 
-	// http.Handle("GET /", http.FileServer(http.Dir("../site")))
+	http.Handle("GET /", http.FileServer(http.Dir("../site")))
 	http.HandleFunc("GET /api/projects", handleProjects)
 	http.HandleFunc("GET /api/notes", handleNotes(db))
 
-	sshServer, err := newSSHServer(sshAddr, db)
+	sshServer, err := newSSHServer(sshAddr, db, loadAdminKey())
 	if err != nil {
 		log.Fatal("creating ssh server: ", err)
 	}
@@ -31,4 +34,18 @@ func main() {
 
 	log.Printf("http listening on %s\n", httpAddr)
 	log.Fatal(http.ListenAndServe(httpAddr, nil))
+}
+
+func loadAdminKey() ssh.PublicKey {
+	s := os.Getenv("ADMIN_KEY")
+	if s == "" {
+		log.Println("ADMIN_KEY not set, admin mode disabled")
+		return nil
+	}
+	key, _, _, _, err := ssh.ParseAuthorizedKey([]byte(s))
+	if err != nil {
+		log.Fatal("parsing ADMIN_KEY: ", err)
+	}
+	log.Println("admin mode enabled")
+	return key
 }
