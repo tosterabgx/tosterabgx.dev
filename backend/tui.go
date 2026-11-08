@@ -35,11 +35,13 @@ type model struct {
 
 func newModel(db *sql.DB, remoteAddr string) model {
 	name := textinput.New()
+	name.SetWidth(30)
 	name.Placeholder = "your name"
 	name.CharLimit = maxNameLen
 	name.Focus()
 
 	note := textinput.New()
+	note.SetWidth(50)
 	note.Placeholder = "say something to the world!"
 	note.CharLimit = maxNoteLen
 
