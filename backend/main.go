@@ -6,12 +6,18 @@ import (
 )
 
 func main() {
+	db, err := openDB("notes.db")
+	if err != nil {
+		log.Fatal("opening database: ", err)
+	}
+	defer db.Close()
+
 	httpAddr := "127.0.0.1:3000"
 	sshAddr := "127.0.0.1:2222"
 
 	http.HandleFunc("GET /api/projects", handleProjects)
 
-	sshServer, err := newSSHServer(sshAddr)
+	sshServer, err := newSSHServer(sshAddr, db)
 	if err != nil {
 		log.Fatal("creating ssh server: ", err)
 	}

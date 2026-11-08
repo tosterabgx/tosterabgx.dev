@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"strings"
@@ -19,17 +20,20 @@ var (
 	titleStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#b3d4c3"))
 	mutedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#6f7974"))
 	labelStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#9ea7a2")).Width(6)
+	errStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#e08a7a"))
 )
 
 type model struct {
+	db         *sql.DB
 	name       textinput.Model
 	note       textinput.Model
 	focused    int
 	submitted  bool
+	err        error
 	remoteAddr string
 }
 
-func newModel(remoteAddr string) model {
+func newModel(db *sql.DB, remoteAddr string) model {
 	name := textinput.New()
 	name.Placeholder = "your name"
 	name.CharLimit = maxNameLen
@@ -39,7 +43,7 @@ func newModel(remoteAddr string) model {
 	note.Placeholder = "say something to the world!"
 	note.CharLimit = maxNoteLen
 
-	return model{name: name, note: note, remoteAddr: remoteAddr}
+	return model{db: db, name: name, note: note, remoteAddr: remoteAddr}
 }
 
 func (m model) Init() tea.Cmd {
@@ -71,9 +75,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if name == "" || note == "" {
 				return m, nil
 			}
+
+			if err := insertNote(m.db, name, note, m.remoteAddr); err != nil {
+				log.Printf("saving note from %s: %v", m.remoteAddr, err)
+				m.err = err
+			} else {
+				log.Printf("saved note from %s", m.remoteAddr)
+			}
 			m.submitted = true
-			// TODO add saving of notes
-			log.Printf("note from %s: name=%q note=%q", m.remoteAddr, name, note)
 			return m, nil
 		}
 	}
@@ -105,7 +114,11 @@ func (m model) View() tea.View {
 	s += mutedStyle.Render("leave a note on tosterabgx.dev") + "\n\n"
 
 	if m.submitted {
-		s += "thanks! your note will show up on my site.\n\n"
+		if m.err != nil {
+			s += errStyle.Render("sorry! something went wrong, try again later") + "\n\n"
+		} else {
+			s += "thanks! your note will show up on my site.\n\n"
+		}
 		s += mutedStyle.Render("press any key to leave")
 		return tea.NewView(s)
 	}
