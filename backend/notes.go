@@ -3,11 +3,17 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"time"
 
 	_ "modernc.org/sqlite"
+)
+
+const (
+	maxNameLen = 24
+	maxNoteLen = 100
 )
 
 type Note struct {
@@ -41,6 +47,12 @@ func openDB(path string) (*sql.DB, error) {
 }
 
 func insertNote(db *sql.DB, name, message, ip string) error {
+	name = sanitize(name, maxNameLen)
+	message = sanitize(message, maxNoteLen)
+	if name == "" || message == "" {
+		return errors.New("empty name or message")
+	}
+
 	_, err := db.Exec(
 		"INSERT INTO notes (name, message, ip, created_at) VALUES (?, ?, ?, ?)",
 		name, message, ip, time.Now().Unix(),

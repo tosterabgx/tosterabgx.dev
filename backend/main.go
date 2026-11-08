@@ -15,6 +15,7 @@ func main() {
 	httpAddr := "127.0.0.1:3000"
 	sshAddr := "127.0.0.1:2222"
 
+	// http.Handle("GET /", http.FileServer(http.Dir("../site")))
 	http.HandleFunc("GET /api/projects", handleProjects)
 	http.HandleFunc("GET /api/notes", handleNotes(db))
 

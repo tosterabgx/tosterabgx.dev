@@ -13,9 +13,7 @@ import (
 )
 
 const (
-	maxNameLen = 24
-	maxNoteLen = 200
-	greeting   = "You've reached Arsenii. I can't come to the terminal right now.\nPlease leave your name and a message after the beep."
+	greeting = "You've reached Arsenii. I can't come to the terminal right now.\nPlease leave your name and a message after the beep."
 )
 
 var (
