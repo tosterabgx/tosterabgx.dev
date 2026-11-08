@@ -39,7 +39,7 @@ func openDB(path string) (*sql.DB, error) {
 
 func insertNote(db *sql.DB, name, message, ip string) error {
 	_, err := db.Exec(
-		"INSERT INTO notes (name, message, ip, created_at) VALUE (?, ?, ?, ?)",
+		"INSERT INTO notes (name, message, ip, created_at) VALUES (?, ?, ?, ?)",
 		name, message, ip, time.Now().Unix(),
 	)
 	return err
