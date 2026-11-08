@@ -16,6 +16,7 @@ func main() {
 	sshAddr := "127.0.0.1:2222"
 
 	http.HandleFunc("GET /api/projects", handleProjects)
+	http.HandleFunc("GET /api/notes", handleNotes(db))
 
 	sshServer, err := newSSHServer(sshAddr, db)
 	if err != nil {

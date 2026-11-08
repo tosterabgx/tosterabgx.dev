@@ -2,6 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
+	"log"
+	"net/http"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -66,4 +69,20 @@ func listNotes(db *sql.DB, limit int) ([]Note, error) {
 		notes = append(notes, n)
 	}
 	return notes, rows.Err()
+}
+
+func handleNotes(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		notes, err := listNotes(db, 50)
+		if err != nil {
+			log.Println("listing notes:", err)
+			http.Error(w, "could not load notes", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(notes); err != nil {
+			log.Println("writing notes response:", err)
+		}
+	}
 }
