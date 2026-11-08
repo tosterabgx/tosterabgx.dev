@@ -12,6 +12,7 @@ import (
 	"charm.land/wish/v2/activeterm"
 	bm "charm.land/wish/v2/bubbletea"
 	"charm.land/wish/v2/logging"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 func newSSHServer(addr string, db *sql.DB, adminKey ssh.PublicKey) (*ssh.Server, error) {
@@ -36,6 +37,9 @@ func newSSHServer(addr string, db *sql.DB, adminKey ssh.PublicKey) (*ssh.Server,
 		wish.WithPublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
 			return true
 		}),
+		wish.WithKeyboardInteractiveAuth(func(ctx ssh.Context, challenger gossh.KeyboardInteractiveChallenge) bool {
+			return true
+		}),
 		wish.WithMiddleware(
 			bm.Middleware(handler),
 			activeterm.Middleware(),
@@ -46,6 +50,6 @@ func newSSHServer(addr string, db *sql.DB, adminKey ssh.PublicKey) (*ssh.Server,
 
 func isAdmin(s ssh.Session, adminKey ssh.PublicKey) bool {
 	return adminKey != nil &&
-		s.PublicKey != nil &&
+		s.PublicKey() != nil &&
 		ssh.KeysEqual(s.PublicKey(), adminKey)
 }
