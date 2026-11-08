@@ -7,6 +7,8 @@
   --bg: #0f1211;
   --text: #eceee9;
   --muted: #9ea7a2;
+  --line: rgba(236, 238, 233, .12);
+  --line-bright: rgba(236, 238, 233, .28)
 }
 
 @media (prefers-reduced-motion:no-preference) {
@@ -117,4 +119,37 @@ nav a:hover {
 .scroll-hint.hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+#projects {
+  padding: 96px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+#projects h2 {
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.1;
+}
+
+.projects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.project {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 12px 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.project:hover {
+  border-color: var(--line-bright);
+  transform: scale(1.01);
 }
