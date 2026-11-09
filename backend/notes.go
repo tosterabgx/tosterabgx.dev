@@ -24,7 +24,7 @@ const (
 var errRatedLimited = errors.New("too many notes from this address")
 
 type Note struct {
-	ID        uint64    `json:"id"`
+	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"created_at"`
@@ -122,4 +122,37 @@ func countRecentNotes(db *sql.DB, ip string, since time.Time) (int, error) {
 	).Scan(&n)
 
 	return n, err
+}
+
+type AdminNote struct {
+	Note
+	IP string
+}
+
+func listNotesAdmin(db *sql.DB, limit int) ([]AdminNote, error) {
+	rows, err := db.Query(
+		"SELECT id, name, message, ip, created_at FROM notes ORDER BY id DESC LIMIT ?",
+		limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var notes []AdminNote
+	for rows.Next() {
+		var n AdminNote
+		var unix int64
+		if err := rows.Scan(&n.ID, &n.Name, &n.Message, &n.IP, &unix); err != nil {
+			return nil, err
+		}
+		n.CreatedAt = time.Unix(unix, 0).UTC()
+		notes = append(notes, n)
+	}
+	return notes, rows.Err()
+}
+
+func deleteNote(db *sql.DB, id int64) error {
+	_, err := db.Exec("DELETE FROM notes WHERE id = ?", id)
+	return err
 }

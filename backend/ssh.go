@@ -24,7 +24,7 @@ func newSSHServer(addr string, db *sql.DB, adminKey ssh.PublicKey) (*ssh.Server,
 
 		if isAdmin(s, adminKey) {
 			log.Printf("admin connected from %s", host)
-
+			return newAdminModel(db), nil
 		}
 		return newModel(db, host), nil
 	}
