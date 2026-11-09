@@ -9,14 +9,15 @@ import (
 )
 
 func main() {
-	db, err := openDB("notes.db")
+	httpAddr := envOr("HTTP_ADDR", "127.0.0.1:3000")
+	sshAddr := envOr("SSH_ADDR", "127.0.0.1:2222")
+	dbPath := envOr("DB_PATH", "notes.db")
+
+	db, err := openDB(dbPath)
 	if err != nil {
 		log.Fatal("opening database: ", err)
 	}
 	defer db.Close()
-
-	httpAddr := "127.0.0.1:3000"
-	sshAddr := "127.0.0.1:2222"
 
 	http.Handle("GET /", http.FileServer(http.Dir("../site")))
 	http.HandleFunc("GET /api/projects", handleProjects)
@@ -34,6 +35,13 @@ func main() {
 
 	log.Printf("http listening on %s\n", httpAddr)
 	log.Fatal(http.ListenAndServe(httpAddr, nil))
+}
+
+func envOr(key, d string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return d
 }
 
 func loadAdminKey() ssh.PublicKey {
