@@ -1,0 +1,16 @@
+tosterabgx.dev {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	handle {
+		root * /opt/tosterabgx.dev/site
+		file_server
+	}
+}
+
+notes.tosterabgx.dev {
+	redir https://tosterabgx.dev/ permanent
+}
