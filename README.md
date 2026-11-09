@@ -9,4 +9,6 @@ The website is made with html/css/js. Though, I wrote a sick backend in Go with 
 ssh -p 2222 notes.tosterabgx.dev
 ```
 
+I tried to make it like an answering machine, and I think it worked out great. TUI is made with bubbletea and wish. Notes are stored in Sqlite3 database.
+
 ![Demo of the guestbook](demo.gif)
